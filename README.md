@@ -2,7 +2,7 @@
 
 **KFOKAM48 · Batch 2 · Phase 3 — rattrapage des séances 1, 2 et 3 (Full Stack)**
 Étudiant : **Ngansop Sumo Rainer** — matricule **221**
-Branch `rattrapage/ngansop-rainer` → PR vers `main`.
+Branch `rattrapage/rainer-ngansop` → PR vers `main` (PR #2).
 
 Application de gestion de tickets de support : un utilisateur déclare une demande,
 le support la consulte, la filtre par statut et la ferme.

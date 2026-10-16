@@ -1,0 +1,26 @@
+# --- IDE ---
+.idea/
+.vscode/
+*.iml
+
+# --- Java / Maven ---
+backend/target/
+*.class
+*.log
+HELP.md
+
+# --- Node / Frontend ---
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+npm-debug.log*
+
+# --- OS ---
+.DS_Store
+
+# --- Env ---
+.env
+
+# --- Harness de vérification : captures régénérées à chaque exécution ---
+tools/verification/captures/
+tools/verification/node_modules/

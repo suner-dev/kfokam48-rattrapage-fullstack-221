@@ -71,6 +71,10 @@ for (const d of demo) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ titre: d.titre, description: d.description }),
   });
+  if (reponse.status === 409) {
+    ok(`« ${d.titre} » déjà présent (RG-02 respectée, rien n'est doublonné)`);
+    continue;
+  }
   if (!reponse.ok) {
     ko(`création de « ${d.titre} » : ${reponse.status}`);
     continue;
@@ -89,32 +93,49 @@ for (const d of demo) {
   ok(`« ${d.titre} » → ${d.statut}`);
 }
 
-console.log('\n=== Réessai : la panne réseau est simulée, le bouton doit la rattraper ===');
-// On bloque volontairement le premier GET pour retrouver l'écran d'erreur, puis
-// on le débloque et on clique « Réessayer » SANS recharger la page. (La panne
-// réelle, backend arrêté, est contrôlée par verifier-3.mjs.)
-let enPanne = true;
+console.log('\n=== Chargement visible, puis réessai après panne réseau ===');
+// La panne est simulée ici (le backend réellement arrêté est contrôlé par
+// verifier-3.mjs) : on garde la première demande en attente 2,5 s pour pouvoir
+// vérifier l'indicateur de chargement, on l'interrompt ensuite pour obtenir
+// l'écran d'erreur, puis on clique « Réessayer » SANS recharger la page.
+let mode = 'attente';
 await page.setRequestInterception(true);
-page.on('request', (requete) => {
-  if (requete.url().includes('/api/tickets') && enPanne) {
-    requete.abort('failed');
-    return;
+page.on('request', async (requete) => {
+  if (!requete.url().includes('/api/tickets')) return requete.continue();
+  if (mode === 'attente') {
+    await attendre(2500);
+    return requete.abort('failed');
   }
-  requete.continue();
+  if (mode === 'panne') return requete.abort('failed');
+  return requete.continue();
 });
 
 await page.goto(APP, { waitUntil: 'load', timeout: 60000 });
-await page.waitForSelector('.etat-erreur', { timeout: 25000 });
-enPanne = false;
-ok('écran d’erreur obtenu sur demande bloquée, réessai disponible');
 
+// 1) État « chargement » : un indicateur doit être visible PENDANT l'appel.
+await page.waitForSelector('.etat-chargement', { timeout: 8000 });
+const chargeurVisible = await page.$eval('.etat-chargement', (e) => e.textContent.replace(/\s+/g, ' ').trim());
+chargeurVisible.length > 0
+  ? ok(`indicateur de chargement visible : « ${chargeurVisible} »`)
+  : ko('indicateur de chargement présent mais muet');
+await page.screenshot({ path: `${OUT}13-ecran-chargement.png`, fullPage: true });
+
+// 2) La demande échoue : l'écran doit sortir du chargement et expliquer.
+mode = 'panne';
+await page.waitForSelector('.etat-erreur', { timeout: 25000 });
+mode = 'ok';
+ok('écran d’erreur obtenu après échec de la demande, réessai proposé');
+
+// 3) Réessai : la liste doit revenir sans rechargement de la page.
+const urlAvantReessai = page.url();
 await page.click('.etat-erreur .bouton-primaire');
 ok('« Réessayer » actionné');
 
 await page.waitForSelector('table tbody tr', { timeout: 25000 });
+page.url() === urlAvantReessai ? ok('réessai effectué sans rechargement de la page') : ko('la page s’est rechargée');
 const lignes = await page.$$eval('table tbody tr', (trs) => trs.length);
 lignes >= demo.length
-  ? ok(`liste revenue après réessai, sans rechargement de page (${lignes} lignes)`)
+  ? ok(`liste revenue après réessai (${lignes} lignes)`)
   : ko(`liste incomplète après réessai : ${lignes} lignes`);
 await page.screenshot({ path: `${OUT}11-ecran-reessai-reussi.png`, fullPage: true });
 await browser.close();

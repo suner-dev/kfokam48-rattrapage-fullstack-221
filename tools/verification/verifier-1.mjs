@@ -170,48 +170,11 @@ const actionSurFerme = await page.evaluate(() => {
   ? ok('aucune action de fermeture proposée sur un ticket fermé')
   : ko(`action encore proposée : ${JSON.stringify(actionSurFerme)}`);
 
-titre('8. Refus 409 sur une fermeture (liste périmée) — message du serveur');
-// Deux onglets : l’onglet B ferme le ticket, l’onglet A (liste périmée) le ferme aussi.
-const pageB = await browser.newPage();
-await pageB.setViewport({ width: 1440, height: 1000 });
-await pageB.goto(APP, { waitUntil: 'domcontentloaded' });
-await pageB.waitForSelector('table tbody tr', { timeout: 15000 });
-await page.evaluate(() => {
-  [...document.querySelectorAll('.puce')].find((b) => b.textContent.trim() === 'En cours')?.click();
-});
-await pageB.evaluate(() => {
-  [...document.querySelectorAll('.puce')].find((b) => b.textContent.trim() === 'En cours')?.click();
-});
-await new Promise((r) => setTimeout(r, 900));
-const cible = await page.evaluate(() => {
-  const ligne = document.querySelector('table tbody tr');
-  const bouton = ligne?.querySelector('.bouton-fermer');
-  return bouton ? ligne.querySelector('.titre-ticket').textContent.trim() : null;
-});
-if (cible) {
-  // B ferme le ticket visé par A
-  await pageB.evaluate((t) => {
-    const ligne = [...document.querySelectorAll('table tbody tr')].find((tr) => tr.textContent.includes(t));
-    ligne.querySelector('.bouton-fermer').click();
-  }, cible);
-  await pageB.waitForSelector('.dialogue', { timeout: 5000 });
-  await pageB.click('.bouton-danger');
-  await new Promise((r) => setTimeout(r, 1200));
-  ok(`onglet B a fermé « ${cible} »`);
-
-  // A, qui a une liste périmée, tente la même fermeture → 409 attendu
-  await page.evaluate((t) => {
-    const ligne = [...document.querySelectorAll('table tbody tr')].find((tr) => tr.textContent.includes(t));
-    ligne.querySelector('.bouton-fermer').click();
-  }, cible);
-  await page.waitForSelector('.dialogue', { timeout: 5000 });
-  await page.click('.bouton-danger');
-  await attendreMessage(page, '.refus-liste', ['409', 'RG-03']);
-  await page.screenshot({ path: `${OUT}08-ecran-409-fermeture.png`, fullPage: true });
-} else {
-  ko('aucun ticket EN_COURS disponible pour provoquer le 409 de fermeture');
-}
-await pageB.close();
+titre('8. Refus 409 sur une fermeture (liste périmée)');
+// Scénario déplacé dans verifier-2.mjs : il est pilotable sans ouvrir deux
+// onglets (le ticket est fermé côté serveur entre deux instantanés de l'écran),
+// donc sans dépendre du chargement de la machine.
+console.log('  (contrôlé par verifier-2.mjs — 409 RG-03 lu sur l’écran)');
 
 await browser.close();
 console.log(`\n=== Bilan : ${echecs === 0 ? 'tout est conforme' : `${echecs} contrôle(s) en échec`} ===`);

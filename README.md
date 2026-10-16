@@ -182,19 +182,21 @@ Chaque script **assert** ce qu'il voit et écrit ses captures dans `tools/verifi
 
 ```bash
 docker exec ticketflow-db psql -U ticketflow -p 5434 -d ticketflow \
-  -c "SELECT id, titre, statut, date_creation FROM tickets WHERE statut = 'OUVERT' ORDER BY id;"
+  -c "SELECT id, titre, statut, date_creation FROM tickets WHERE titre = 'Clavier du poste 8 hors service';"
 ```
 
 ```
- id |                 titre                 |  statut  |         date_creation
-----+---------------------------------------+----------+-------------------------------
- 17 | Imprimante du 3e étage bloquée        | OUVERT   | 2026-10-16 17:12:21.418225+00
- 18 | Badge d’accès non reconnu             | OUVERT   | 2026-10-16 17:12:21.506188+00
- 21 | Clavier du poste 8 hors service       | OUVERT   | 2026-10-16 17:12:38.88507+00
+ id |              titre              | statut |         date_creation
+----+---------------------------------+--------+-------------------------------
+ 29 | Clavier du poste 8 hors service | OUVERT | 2026-10-16 17:32:22.395364+00
+(1 row)
 ```
 
-Le ticket **n° 21** est celui créé en cliquant *Try it out → Execute* dans Swagger UI
-(`verifier-5.mjs` le vérifie : 201 reçu par le navigateur, ligne présente en base).
+Sortie relevée sur la base de ce poste. L'identifiant dépend de l'ordre des tests ;
+le titre, lui, ne change pas : c'est **l'exemple documenté sur le `POST`**
+(`@ExampleObject`). `verifier-5.mjs` l'a créé en cliquant *Try it out → Execute* dans
+Swagger UI — le 201 est relevé sur le réseau par le navigateur — puis est allé le
+chercher **dans la table**, sans passer par l'API.
 `scripts/verif-base.sql` contrôle en plus les invariants RG-01 (longueur) et RG-02 (doublons).
 
 ---

@@ -1,0 +1,664 @@
+/*
+ * Feuille de style unique de l'écran.
+ * Organisation : jetons de design → base → mise en page → cartes →
+ * formulaire → liste & badges → états → dialogue → boutons → responsive.
+ */
+
+/* ------------------------------------------------------------------ */
+/* 1. Jetons                                                           */
+/* ------------------------------------------------------------------ */
+:root {
+  --couleur-fond: #f4f6fb;
+  --couleur-surface: #ffffff;
+  --couleur-surface-2: #f9fbfe;
+  --couleur-bordure: #e3e8f0;
+  --couleur-texte: #16202f;
+  --couleur-texte-adouci: #5b6879;
+  --couleur-primaire: #2f5bd7;
+  --couleur-primaire-fonce: #21429f;
+  --couleur-danger: #c0392b;
+  --couleur-succes: #1f7a4d;
+
+  --statut-ouvert-fond: #e8f1ff;
+  --statut-ouvert-texte: #1a4fa8;
+  --statut-cours-fond: #fff4e0;
+  --statut-cours-texte: #9a5b00;
+  --statut-ferme-fond: #eceff4;
+  --statut-ferme-texte: #55606f;
+
+  --rayon: 14px;
+  --rayon-petit: 999px;
+  --ombre: 0 1px 2px rgba(20, 32, 51, 0.04), 0 8px 24px rgba(20, 32, 51, 0.07);
+  --ombre-douce: 0 1px 2px rgba(20, 32, 51, 0.05);
+  --transition: 160ms ease-out;
+
+  --police: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, 'Noto Sans', sans-serif;
+}
+
+/* ------------------------------------------------------------------ */
+/* 2. Base                                                             */
+/* ------------------------------------------------------------------ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--police);
+  color: var(--couleur-texte);
+  background:
+    radial-gradient(1200px 500px at 100% -10%, #e7eeff 0%, transparent 60%),
+    var(--couleur-fond);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+}
+
+.visuellement-cache {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--couleur-primaire) 45%, white);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/* 3. Mise en page                                                     */
+/* ------------------------------------------------------------------ */
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 40px 22px 24px;
+}
+
+.page-entete {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 26px;
+}
+
+.page-entete h1 {
+  font-size: 26px;
+  letter-spacing: -0.02em;
+}
+
+.page-lede {
+  margin-top: 6px;
+  max-width: 62ch;
+  color: var(--couleur-texte-adouci);
+  font-size: 14.5px;
+}
+
+.indicateurs {
+  display: flex;
+  gap: 12px;
+}
+
+.indicateur {
+  background: var(--couleur-surface);
+  border: 1px solid var(--couleur-bordure);
+  border-radius: var(--rayon);
+  box-shadow: var(--ombre-douce);
+  padding: 12px 18px;
+  min-width: 96px;
+  display: grid;
+  justify-items: center;
+}
+
+.indicateur-valeur {
+  font-size: 24px;
+  font-weight: 650;
+  color: var(--couleur-primaire);
+}
+
+.indicateur-legende {
+  font-size: 12.5px;
+  color: var(--couleur-texte-adouci);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.grille {
+  display: grid;
+  grid-template-columns: minmax(320px, 400px) 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.pied {
+  text-align: center;
+  color: var(--couleur-texte-adouci);
+  font-size: 13px;
+  padding: 18px 0 30px;
+}
+
+/* ------------------------------------------------------------------ */
+/* 4. Cartes                                                           */
+/* ------------------------------------------------------------------ */
+.carte {
+  background: var(--couleur-surface);
+  border: 1px solid var(--couleur-bordure);
+  border-radius: var(--rayon);
+  box-shadow: var(--ombre);
+  overflow: hidden;
+}
+
+.carte-entete {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--couleur-bordure);
+  background: linear-gradient(var(--couleur-surface-2), var(--couleur-surface));
+}
+
+.carte-entete h2 {
+  font-size: 17px;
+  letter-spacing: -0.01em;
+}
+
+.carte-entete-range {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.carte-sous-titre {
+  margin-top: 3px;
+  font-size: 13px;
+  color: var(--couleur-texte-adouci);
+}
+
+/* ------------------------------------------------------------------ */
+/* 5. Formulaire                                                       */
+/* ------------------------------------------------------------------ */
+.formulaire {
+  padding: 18px 20px 20px;
+  display: grid;
+  gap: 16px;
+}
+
+.champ {
+  display: grid;
+  gap: 6px;
+}
+
+.champ label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--couleur-texte);
+}
+
+.obligatoire {
+  color: var(--couleur-danger);
+}
+
+.facultatif {
+  font-weight: 400;
+  color: var(--couleur-texte-adouci);
+}
+
+.champ input,
+.champ textarea {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid var(--couleur-bordure);
+  border-radius: 10px;
+  background: var(--couleur-surface);
+  color: var(--couleur-texte);
+  font-size: 15px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  resize: vertical;
+}
+
+.champ input::placeholder,
+.champ textarea::placeholder {
+  color: color-mix(in srgb, var(--couleur-texte-adouci) 70%, white);
+}
+
+.champ input:hover,
+.champ textarea:hover {
+  border-color: color-mix(in srgb, var(--couleur-primaire) 35%, var(--couleur-bordure));
+}
+
+.champ input:focus,
+.champ textarea:focus {
+  outline: none;
+  border-color: var(--couleur-primaire);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--couleur-primaire) 14%, transparent);
+}
+
+.champ input[aria-invalid='true'] {
+  border-color: var(--couleur-danger);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--couleur-danger) 12%, transparent);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.aide {
+  font-size: 13px;
+  color: var(--couleur-texte-adouci);
+}
+
+/* ------------------------------------------------------------------ */
+/* 6. Messages serveur (400 / 409)                                    */
+/* ------------------------------------------------------------------ */
+.refus {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 13px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--couleur-danger) 30%, var(--couleur-bordure));
+  background: color-mix(in srgb, var(--couleur-danger) 7%, white);
+  color: #7d271c;
+  font-size: 14px;
+}
+
+.refus-liste {
+  margin: 14px 20px 0;
+  position: relative;
+}
+
+.refus-code {
+  flex: none;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 2px 8px;
+  border-radius: var(--rayon-petit);
+  background: var(--couleur-danger);
+  color: #fff;
+  margin-top: 1px;
+}
+
+.bouton-fermer-banniere {
+  margin-left: auto;
+  background: none;
+  border: 0;
+  color: #7d271c;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.acceptation {
+  padding: 10px 13px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--couleur-succes) 9%, white);
+  border: 1px solid color-mix(in srgb, var(--couleur-succes) 28%, var(--couleur-bordure));
+  color: #145c39;
+  font-size: 14px;
+}
+
+/* ------------------------------------------------------------------ */
+/* 7. Filtres                                                          */
+/* ------------------------------------------------------------------ */
+.filtres {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 16px 20px 0;
+}
+
+.puce {
+  border: 1px solid var(--couleur-bordure);
+  background: var(--couleur-surface);
+  color: var(--couleur-texte-adouci);
+  border-radius: var(--rayon-petit);
+  padding: 7px 15px;
+  font-size: 13.5px;
+  font-weight: 550;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.puce:hover {
+  border-color: color-mix(in srgb, var(--couleur-primaire) 40%, var(--couleur-bordure));
+  color: var(--couleur-texte);
+}
+
+.puce-active {
+  background: var(--couleur-primaire);
+  border-color: var(--couleur-primaire);
+  color: #fff;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--couleur-primaire) 30%, transparent);
+}
+
+/* ------------------------------------------------------------------ */
+/* 8. Liste et badges                                                  */
+/* ------------------------------------------------------------------ */
+.zone-liste {
+  padding: 14px 20px 20px;
+  min-height: 180px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--couleur-bordure);
+  border-radius: 12px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14.5px;
+}
+
+.table thead th {
+  text-align: left;
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--couleur-texte-adouci);
+  background: var(--couleur-surface-2);
+  border-bottom: 1px solid var(--couleur-bordure);
+  padding: 11px 14px;
+  white-space: nowrap;
+}
+
+.table tbody td {
+  padding: 13px 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--couleur-bordure) 60%, transparent);
+  vertical-align: top;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.table tbody tr {
+  transition: background var(--transition);
+}
+
+.table tbody tr:hover {
+  background: color-mix(in srgb, var(--couleur-primaire) 4%, transparent);
+}
+
+.col-titre {
+  width: 40%;
+}
+
+.col-statut,
+.col-date,
+.col-action {
+  width: 20%;
+}
+
+.titre-ticket {
+  display: block;
+  font-weight: 600;
+}
+
+.description-ticket {
+  display: block;
+  margin-top: 3px;
+  font-size: 13px;
+  color: var(--couleur-texte-adouci);
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 11px;
+  border-radius: var(--rayon-petit);
+  font-size: 12.5px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.badge-ouvert {
+  background: var(--statut-ouvert-fond);
+  color: var(--statut-ouvert-texte);
+}
+
+.badge-en_cours {
+  background: var(--statut-cours-fond);
+  color: var(--statut-cours-texte);
+}
+
+.badge-ferme {
+  background: var(--statut-ferme-fond);
+  color: var(--statut-ferme-texte);
+}
+
+.aucune-action {
+  color: color-mix(in srgb, var(--couleur-texte-adouci) 70%, white);
+}
+
+.bouton-tri {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.bouton-tri:hover {
+  color: var(--couleur-primaire);
+}
+
+/* ------------------------------------------------------------------ */
+/* 9. Les quatre états                                                 */
+/* ------------------------------------------------------------------ */
+.etat {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 34px 16px;
+  border: 1px dashed var(--couleur-bordure);
+  border-radius: 12px;
+  background: var(--couleur-surface-2);
+}
+
+.etat .titre {
+  font-weight: 650;
+}
+
+.etat .detail {
+  color: var(--couleur-texte-adouci);
+  font-size: 14px;
+  max-width: 58ch;
+}
+
+.rouleau {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 3px solid color-mix(in srgb, var(--couleur-primaire) 22%, white);
+  border-top-color: var(--couleur-primaire);
+  animation: rotation 800ms linear infinite;
+  margin-bottom: 6px;
+}
+
+@keyframes rotation {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rouleau {
+    animation-duration: 1.6s;
+  }
+}
+
+.etat-vide .dessin {
+  width: 62px;
+  height: 62px;
+  fill: none;
+  stroke: color-mix(in srgb, var(--couleur-texte-adouci) 55%, white);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  margin-bottom: 8px;
+}
+
+.etat-erreur {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--couleur-danger) 28%, var(--couleur-bordure));
+  background: color-mix(in srgb, var(--couleur-danger) 5%, white);
+}
+
+/* ------------------------------------------------------------------ */
+/* 10. Boutons                                                         */
+/* ------------------------------------------------------------------ */
+.bouton {
+  border-radius: 10px;
+  padding: 10px 17px;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all var(--transition);
+}
+
+.bouton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.bouton-primaire {
+  background: var(--couleur-primaire);
+  color: #fff;
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--couleur-primaire) 28%, transparent);
+}
+
+.bouton-primaire:not(:disabled):hover {
+  background: var(--couleur-primaire-fonce);
+}
+
+.bouton-secondaire {
+  background: var(--couleur-surface);
+  border-color: var(--couleur-bordure);
+  color: var(--couleur-texte);
+}
+
+.bouton-secondaire:not(:disabled):hover {
+  border-color: color-mix(in srgb, var(--couleur-primaire) 45%, var(--couleur-bordure));
+  color: var(--couleur-primaire);
+}
+
+.bouton-fermer {
+  background: color-mix(in srgb, var(--couleur-primaire) 8%, white);
+  border-color: color-mix(in srgb, var(--couleur-primaire) 25%, var(--couleur-bordure));
+  color: var(--couleur-primaire);
+  padding: 7px 14px;
+  font-size: 13.5px;
+}
+
+.bouton-fermer:not(:disabled):hover {
+  background: var(--couleur-primaire);
+  color: #fff;
+}
+
+.bouton-danger {
+  background: var(--couleur-danger);
+  color: #fff;
+}
+
+.bouton-danger:not(:disabled):hover {
+  background: color-mix(in srgb, var(--couleur-danger) 85%, black);
+}
+
+/* ------------------------------------------------------------------ */
+/* 11. Dialogue de confirmation                                        */
+/* ------------------------------------------------------------------ */
+.voile {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 20, 32, 0.45);
+  backdrop-filter: blur(2px);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  z-index: 50;
+}
+
+.dialogue {
+  background: var(--couleur-surface);
+  border-radius: var(--rayon);
+  box-shadow: 0 24px 60px rgba(10, 18, 32, 0.28);
+  max-width: 430px;
+  width: 100%;
+  padding: 22px;
+}
+
+.dialogue h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.dialogue p {
+  color: var(--couleur-texte-adouci);
+  font-size: 14.5px;
+}
+
+.dialogue strong {
+  color: var(--couleur-texte);
+}
+
+.dialogue-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* ------------------------------------------------------------------ */
+/* 12. Responsive                                                      */
+/* ------------------------------------------------------------------ */
+@media (max-width: 900px) {
+  .grille {
+    grid-template-columns: 1fr;
+  }
+
+  .page {
+    padding-top: 26px;
+  }
+
+  .indicateurs {
+    order: -1;
+  }
+}

@@ -1,10 +1,9 @@
 import { useState, type FormEvent } from 'react';
-import type { ErreurApi } from '../../../shared/http/httpClient';
-import type { NouvelleDemande } from '../domain/ticket';
+import type { ErreurServeur, NouvelleDemande } from '../domain/ticket';
 
 interface Props {
   enCours: boolean;
-  erreur: ErreurApi | null;
+  erreur: ErreurServeur | null;
   onSoumettre: (demande: NouvelleDemande) => Promise<boolean>;
   onEffacerErreur: () => void;
 }

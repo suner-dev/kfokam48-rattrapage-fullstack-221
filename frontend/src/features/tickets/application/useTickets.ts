@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ErreurApi } from '../../../shared/http/httpClient';
 import { ticketApi } from '../api/ticketApi';
-import type { FiltreStatut, NouvelleDemande, Ticket } from '../domain/ticket';
+import type { ErreurServeur, FiltreStatut, NouvelleDemande, Ticket } from '../domain/ticket';
 
 /** Les quatre états que l'écran doit pouvoir afficher. */
 export type EtatListe = 'chargement' | 'donnees' | 'vide' | 'erreur';
@@ -11,7 +11,7 @@ export type SensTri = 'recent' | 'ancien';
 export interface EtatTickets {
   liste: Ticket[];
   etat: EtatListe;
-  erreur: ErreurApi | null;
+  erreur: ErreurServeur | null;
   filtre: FiltreStatut;
   sensTri: SensTri;
   compteurOuverts: number;
@@ -23,12 +23,12 @@ export interface EtatTickets {
 
   creer: (demande: NouvelleDemande) => Promise<boolean>;
   enCreation: boolean;
-  erreurCreation: ErreurApi | null;
+  erreurCreation: ErreurServeur | null;
   effacerErreurCreation: () => void;
 
-  fermer: (id: number) => Promise<ErreurApi | null>;
+  fermer: (id: number) => Promise<ErreurServeur | null>;
   idEnFermeture: number | null;
-  erreurFermeture: ErreurApi | null;
+  erreurFermeture: ErreurServeur | null;
   effacerErreurFermeture: () => void;
 }
 
@@ -118,7 +118,7 @@ export function useTickets(): EtatTickets {
   );
 
   const fermer = useCallback(
-    async (id: number): Promise<ErreurApi | null> => {
+    async (id: number): Promise<ErreurServeur | null> => {
       setIdEnFermeture(id);
       setErreurFermeture(null);
       try {

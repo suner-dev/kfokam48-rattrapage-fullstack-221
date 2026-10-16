@@ -62,8 +62,10 @@ frontend/src/
                                    FiltreStatutBarre, BoiteConfirmation, StatutBadge
 ```
 
-Aucun composant n'appelle l'API directement, et `alert()`/`confirm()` ne sont pas
-utilisés : la confirmation est une boîte de dialogue accessible (Échap, focus).
+Aucun composant n'appelle l'API directement — et aucun composant n'importe même un type
+de la couche HTTP : les composants ne connaissent qu'`ErreurServeur`, défini dans le
+domaine de la fonctionnalité. La confirmation est une boîte de dialogue accessible
+(Échap, focus), jamais un `alert()` ni un `confirm()`.
 
 ---
 
@@ -170,7 +172,7 @@ cd tools/verification && npm install
 node verifier-1.mjs   # liste/colonnes, 400, 409, création sans rechargement, filtres, fermeture confirmée
 node verifier-2.mjs   # 409 sur fermeture depuis une liste périmée, état « Aucun ticket »
 node verifier-3.mjs   # backend VRAIMENT arrêté : état erreur + bouton Réessayer
-node verifier-4.mjs   # réessai après retour du serveur, base de démonstration re-remplie
+node verifier-4.mjs   # indicateur de chargement pendant l'appel, réessai, base de démonstration re-remplie
 node verifier-5.mjs   # page Swagger (3 endpoints + codes) et création depuis Swagger
 ```
 
@@ -208,11 +210,15 @@ champ fautif remis en évidence, aucune `alert()` :
 
 ![Refus 409 (RG-02) affiché sur l'écran](docs/captures/ecran-409.png)
 
-Les quatre états de l'écran, plus la confirmation avant fermeture :
+Les quatre états de l'écran, tels que contrôlés par le harness navigateur :
 
-| Données | Liste vide | Erreur serveur (backend arrêté) | Confirmation |
+| 1. Chargement | 2. Données | 3. Liste vide | 4. Erreur (backend arrêté) |
 | --- | --- | --- | --- |
-| ![liste](docs/captures/ecran-liste.png) | ![vide](docs/captures/ecran-liste-vide.png) | ![erreur](docs/captures/ecran-erreur-serveur.png) | ![confirmation](docs/captures/ecran-confirmation.png) |
+| ![chargement](docs/captures/ecran-chargement.png) | ![liste](docs/captures/ecran-liste.png) | ![vide](docs/captures/ecran-liste-vide.png) | ![erreur](docs/captures/ecran-erreur-serveur.png) |
+
+Et la confirmation demandée **avant** l'appel de fermeture :
+
+![Confirmation avant fermeture](docs/captures/ecran-confirmation.png)
 
 ---
 

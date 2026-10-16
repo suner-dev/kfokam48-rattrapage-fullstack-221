@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: ticketflow-api
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5434/ticketflow}
+    username: ${DB_USERNAME:ticketflow}
+    password: ${DB_PASSWORD:ticketflow}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: ticketflow-pool
+      connection-timeout: 10000
+      maximum-pool-size: 10
+      # PostgreSQL émet des NOTICE (ex. « constraint ... does not exist, skipping »)
+      # pendant la maintenance de schéma par Hibernate : ce sont des informations,
+      # pas des erreurs. On les filtre à la source pour des logs de démarrage propres.
+      connection-init-sql: SET client_min_messages = warning
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      # La structure de la table est créée/maintenue par Hibernate au démarrage.
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: false
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: never
+    include-stacktrace: never
+
+app:
+  cors:
+    # Origines de développement du frontend : les deux écritures du même poste
+    # (localhost et 127.0.0.1) sont acceptées.
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: WARN
+    org.springframework.web: WARN
+    # Degrade les rappels informatifs de springdoc (endpoints actifs) en silencieux :
+    # les logs de démarrage restent ainsi exempts de tout avertissement.
+    org.springdoc.core.events: ERROR
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"

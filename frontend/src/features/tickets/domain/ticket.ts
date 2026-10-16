@@ -26,6 +26,23 @@ export interface NouvelleDemande {
 /** Filtre de liste : undefined = tous. */
 export type FiltreStatut = Statut | undefined;
 
+/**
+ * Contrat d'une erreur telle que l'écran doit l'afficher : le code HTTP, le
+ * message du serveur, la règle nommée et les champs fautifs.
+ *
+ * Les composants dépendent de cette forme du domaine et non de la classe du
+ * client HTTP : l'interface reste ainsi totalement découplée de la couche
+ * réseau (la classe ErreurApi la satisfait structurellement).
+ */
+export interface ErreurServeur {
+  readonly code: number;
+  readonly message: string;
+  readonly regle: string | null;
+  readonly champs: readonly string[];
+  /** true quand aucune réponse n'est arrivée : le serveur est injoignable. */
+  readonly estInjoignable: boolean;
+}
+
 const LIBELLES: Record<Statut, string> = {
   OUVERT: 'Ouvert',
   EN_COURS: 'En cours',

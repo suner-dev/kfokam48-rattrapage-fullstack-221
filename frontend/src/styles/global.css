@@ -602,6 +602,12 @@ button {
   background: color-mix(in srgb, var(--couleur-danger) 85%, black);
 }
 
+.actions {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+
 /* ------------------------------------------------------------------ */
 /* 11. Dialogue de confirmation                                        */
 /* ------------------------------------------------------------------ */

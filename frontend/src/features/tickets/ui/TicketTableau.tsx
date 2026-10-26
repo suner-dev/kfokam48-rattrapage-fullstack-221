@@ -60,28 +60,30 @@ export function TicketTableau({ tickets, sensTri, enFermeture, enChangementStatu
                 </td>
                 <td className="col-date">{formaterDate(ticket.dateCreation)}</td>
                 <td className="col-action">
-                  {fermable ? (
-                    <button
-                      type="button"
-                      className="bouton bouton-fermer"
-                      disabled={enCours}
-                      onClick={() => onDemandeFermeture(ticket)}
-                    >
-                      {enCours ? 'Fermeture…' : 'Fermer'}
-                    </button>
-                  ) : (
-                    <span className="aucune-action">—</span>
-                  )}
-                  {changementPossible ? (
-                    <button
-                      type="button"
-                      className="bouton bouton-statut"
-                      disabled={enChangement}
-                      onClick={() => onDemandeChangementStatut(ticket)}
-                    >
-                      {enChangement ? 'Modification…' : `Passer ${libelleStatut(statutCible)}`}
-                    </button>
-                  ) : null}
+                  <div className="actions">
+                    {fermable ? (
+                      <button
+                        type="button"
+                        className="bouton bouton-fermer"
+                        disabled={enCours}
+                        onClick={() => onDemandeFermeture(ticket)}
+                      >
+                        {enCours ? 'Fermeture…' : 'Fermer'}
+                      </button>
+                    ) : (
+                      <span className="aucune-action">—</span>
+                    )}
+                    {changementPossible ? (
+                      <button
+                        type="button"
+                        className="bouton bouton-statut"
+                        disabled={enChangement}
+                        onClick={() => onDemandeChangementStatut(ticket)}
+                      >
+                        {enChangement ? 'Modification…' : `Passer ${libelleStatut(statutCible)}`}
+                      </button>
+                    ) : null}
+                  </div>
                 </td>
               </tr>
             );

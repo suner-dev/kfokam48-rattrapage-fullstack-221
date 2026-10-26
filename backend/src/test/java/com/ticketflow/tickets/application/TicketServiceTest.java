@@ -146,6 +146,56 @@ class TicketServiceTest {
         verify(repository, never()).tous();
     }
 
+    @Test
+    @DisplayName("Un ticket OUVERT peut passer en EN_COURS")
+    void passerEnCoursDepuisOuvert() {
+        Ticket ticket = Ticket.nouveau("Wifi coupé", null);
+        when(repository.parId(1L)).thenReturn(Optional.of(ticket));
+        when(repository.sauvegarder(any(Ticket.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        TicketDto resultat = service.changerStatut(1L, Statut.EN_COURS);
+
+        assertThat(resultat.statut()).isEqualTo(Statut.EN_COURS);
+        assertThat(ticket.getStatut()).isEqualTo(Statut.EN_COURS);
+    }
+
+    @Test
+    @DisplayName("Un ticket EN_COURS peut repasser en OUVERT")
+    void repasserOuvertDepuisEnCours() {
+        Ticket ticket = Ticket.nouveau("Wifi coupé", null);
+        placerEnCours(ticket);
+        when(repository.parId(2L)).thenReturn(Optional.of(ticket));
+        when(repository.sauvegarder(any(Ticket.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        TicketDto resultat = service.changerStatut(2L, Statut.OUVERT);
+
+        assertThat(resultat.statut()).isEqualTo(Statut.OUVERT);
+    }
+
+    @Test
+    @DisplayName("Un ticket FERME ne peut plus changer de statut : 409 RG-03")
+    void refuserChangementDepuisFerme() {
+        Ticket ticket = Ticket.nouveau("Wifi coupé", null);
+        ticket.fermer();
+        when(repository.parId(3L)).thenReturn(Optional.of(ticket));
+
+        assertThatThrownBy(() -> service.changerStatut(3L, Statut.EN_COURS))
+                .isInstanceOf(RegleDeGestionVioleeException.class)
+                .hasMessageContaining("RG-03");
+
+        verify(repository, never()).sauvegarder(any());
+    }
+
+    @Test
+    @DisplayName("Un identifiant inconnu lève TicketIntrouvableException (→ 404)")
+    void refuserChangementDunIdentifiantInconnu() {
+        when(repository.parId(anyLong())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.changerStatut(99L, Statut.EN_COURS))
+                .isInstanceOf(TicketIntrouvableException.class)
+                .hasMessageContaining("99");
+    }
+
     /**
      * Place un ticket au statut EN_COURS pour les besoins du test.
      * Aucun endpoint ne permet encore cette transition (le sujet n'impose

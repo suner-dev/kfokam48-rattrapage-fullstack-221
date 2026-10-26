@@ -62,6 +62,23 @@ export function peutProposerFermeture(statut: Statut): boolean {
   return statut === 'OUVERT' || statut === 'EN_COURS';
 }
 
+/**
+ * Reflet de RG-03 côté affichage : on ne peut proposer un changement de
+ * statut que si le ticket n'est pas déjà FERME. Un ticket fermé ne change
+ * plus d'état.
+ */
+export function peutProposerChangementStatut(statut: Statut): boolean {
+  return statut !== 'FERME';
+}
+
+/**
+ * Statut visé par le bouton de changement, selon le statut actuel.
+ * OUVERT → EN_COURS ; EN_COURS → OUVERT.
+ */
+export function statutCiblePourChangement(statut: Statut): Statut {
+  return statut === 'OUVERT' ? 'EN_COURS' : 'OUVERT';
+}
+
 export function formaterDate(iso: string): string {
   const date = new Date(iso);
   return new Intl.DateTimeFormat('fr-FR', {

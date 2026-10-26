@@ -1,6 +1,6 @@
 import { http } from '../../../shared/http/httpClient';
 import { API_URL } from '../../../config/env';
-import type { FiltreStatut, NouvelleDemande, Ticket } from '../domain/ticket';
+import type { FiltreStatut, NouvelleDemande, Statut, Ticket } from '../domain/ticket';
 
 /**
  * Service dédié aux appels API « tickets ».
@@ -27,6 +27,14 @@ export const ticketApi = {
   /** PATCH /api/tickets/{id}/fermer */
   async fermer(id: number): Promise<Ticket> {
     const { donnee } = await http.patch<Ticket>(`${API_URL}/api/tickets/${id}/fermer`);
+    return donnee;
+  },
+
+  /** PATCH /api/tickets/{id}/statut — transition OUVERT ↔ EN_COURS (ou vers FERME). */
+  async changerStatut(id: number, statut: Statut): Promise<Ticket> {
+    const { donnee } = await http.patch<Ticket>(`${API_URL}/api/tickets/${id}/statut`, {
+      statut,
+    });
     return donnee;
   },
 };

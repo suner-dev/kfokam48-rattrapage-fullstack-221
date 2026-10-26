@@ -1,19 +1,28 @@
-import { formaterDate, peutProposerFermeture, type Ticket } from '../domain/ticket';
+import {
+  formaterDate,
+  libelleStatut,
+  peutProposerChangementStatut,
+  peutProposerFermeture,
+  statutCiblePourChangement,
+  type Ticket,
+} from '../domain/ticket';
 import { StatutBadge } from './StatutBadge';
 
 interface Props {
   tickets: Ticket[];
   sensTri: 'recent' | 'ancien';
   enFermeture: number | null;
+  enChangementStatut: number | null;
   onTri: () => void;
   onDemandeFermeture: (ticket: Ticket) => void;
+  onDemandeChangementStatut: (ticket: Ticket) => void;
 }
 
 /**
  * Composant de liste : pur affichage. Il ne connaît ni fetch ni l'état
  * applicatif, il reçoit des tickets et émet des intentions.
  */
-export function TicketTableau({ tickets, sensTri, enFermeture, onTri, onDemandeFermeture }: Props) {
+export function TicketTableau({ tickets, sensTri, enFermeture, enChangementStatut, onTri, onDemandeFermeture, onDemandeChangementStatut }: Props) {
   return (
     <div className="table-wrapper">
       <table className="table">
@@ -35,6 +44,9 @@ export function TicketTableau({ tickets, sensTri, enFermeture, onTri, onDemandeF
           {tickets.map((ticket) => {
             const fermable = peutProposerFermeture(ticket.statut);
             const enCours = enFermeture === ticket.id;
+            const changementPossible = peutProposerChangementStatut(ticket.statut);
+            const enChangement = enChangementStatut === ticket.id;
+            const statutCible = statutCiblePourChangement(ticket.statut);
             return (
               <tr key={ticket.id}>
                 <td className="col-titre">
@@ -60,6 +72,16 @@ export function TicketTableau({ tickets, sensTri, enFermeture, onTri, onDemandeF
                   ) : (
                     <span className="aucune-action">—</span>
                   )}
+                  {changementPossible ? (
+                    <button
+                      type="button"
+                      className="bouton bouton-statut"
+                      disabled={enChangement}
+                      onClick={() => onDemandeChangementStatut(ticket)}
+                    >
+                      {enChangement ? 'Modification…' : `Passer ${libelleStatut(statutCible)}`}
+                    </button>
+                  ) : null}
                 </td>
               </tr>
             );

@@ -78,6 +78,27 @@ public class TicketService {
         return TicketDto.depuis(repository.sauvegarder(ticket));
     }
 
+    /**
+     * Transition de statut d'un ticket existant.
+     * 404 si l'identifiant est inconnu ; 409 RG-03 si le ticket est déjà FERME.
+     */
+    @Transactional
+    public TicketDto changerStatut(Long id, Statut nouveauStatut) {
+        Ticket ticket = repository.parId(id)
+                .orElseThrow(() -> new TicketIntrouvableException(id));
+        if (ticket.getStatut() == Statut.FERME) {
+            throw new RegleDeGestionVioleeException(
+                    "RG-03",
+                    "Le ticket n°" + id + " est FERME : un ticket fermé ne change plus d'état (RG-03).");
+        }
+        if (nouveauStatut == Statut.FERME) {
+            ticket.fermer();
+        } else {
+            ticket.changerStatut(nouveauStatut);
+        }
+        return TicketDto.depuis(repository.sauvegarder(ticket));
+    }
+
     /** Description facultative : une valeur vide est normalisée en null. */
     private static String description(TicketCreationDto dto) {
         return (dto.description() == null || dto.description().isBlank())

@@ -70,6 +70,18 @@ public class Ticket {
         this.statut = Statut.FERME;
     }
 
+    /**
+     * Changement de statut explicite (OUVERT ↔ EN_COURS, ou vers FERME).
+     * Un ticket déjà FERME ne peut plus changer d'état (RG-03).
+     */
+    public void changerStatut(Statut nouveauStatut) {
+        if (this.statut == Statut.FERME) {
+            throw new IllegalStateException(
+                    "Un ticket FERME ne peut plus changer d'état (RG-03).");
+        }
+        this.statut = nouveauStatut;
+    }
+
     public Long getId() {
         return id;
     }

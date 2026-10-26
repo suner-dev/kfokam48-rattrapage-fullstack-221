@@ -85,6 +85,7 @@ ce que envoie le client ne peut fixer l'identifiant, le statut ou la date.
 | `POST` | `/api/tickets` | `201`, `400`, `409` |
 | `GET` | `/api/tickets` | `200` (+ `400` si le filtre n'est pas un statut connu) |
 | `PATCH` | `/api/tickets/{id}/fermer` | `200`, `404`, `409` |
+| `PATCH` | `/api/tickets/{id}/statut` | `200`, `400`, `404`, `409` |
 
 Corps d'erreur unique (`ErreurReponse`) :
 
@@ -226,17 +227,20 @@ Et la confirmation demandée **avant** l'appel de fermeture :
 
 ## 7. Ce qui manque, et ce que je recommande
 
-Le sujet ne fournit **aucun endpoint pour passer un ticket en `EN_COURS`** : ce statut
-n'est donc atteignable que par la base (c'est ainsi que les jeux de démonstration et
-les tests le positionnent). Trois évolutions, dans l'ordre où je les ferais :
+Trois évolutions étaient identifiées dans la version initiale de l'API. La première
+est maintenant implémentée ; les deux autres restent des recommandations.
 
-1. **`PATCH /api/tickets/{id}/statut` avec DTO de transition** — *pourquoi* : sans lui,
-   `EN_COURS` est un état mort de l'API et le filtre demandé par le sujet ne sert à rien
-   en production. *Coût si on attend* : chaque écran de workflow va bricoler la base.
+1. ✅ **`PATCH /api/tickets/{id}/statut` avec DTO de transition** — *fait* :
+   `EN_COURS` n'est plus un état mort de l'API. Le filtre par statut demandé par
+   le sujet est désormais exploitable en production (transitions OUVERT ↔ EN_COURS,
+   ou vers FERME, refus 409 RG-03 si le ticket est déjà fermé). Voir la table des
+   endpoints §3.
+
 2. **Journal des transitions (`ticket_evenement`)** — *pourquoi* : la fermeture est
    destructive pour l'historique, et un support sans date de fermeture ne peut pas
    mesurer ses délais. *Coût si on attend* : il faut rejouer l'historique, ce qui est
    impossible sans trace.
+
 3. **Authentification et filtrage par agence** — *pourquoi* : `POST` et `PATCH` sont
    publics, donc n'importe qui peut fermer le ticket d'un autre. *Coût si on attend* :
    plus le nombre d'écrans augmente, plus reprendre la surface d'API est cher.

@@ -29,6 +29,9 @@ public class OpenApiConfig {
                         - **RG-02** — deux tickets ne peuvent pas avoir le même titre (refus 409).
                         - **RG-03** — un ticket ne peut être fermé que s'il est OUVERT ou EN_COURS ;
                           un ticket FERME ne change plus d'état (refus 409).
+                        - Le statut d'un ticket peut faire l'objet d'une transition
+                          (`PATCH /api/tickets/{id}/statut`) : OUVERT ↔ EN_COURS, ou vers FERME.
+                          Un ticket déjà FERME ne change plus d'état (refus 409 RG-03).
 
                         Le client n'envoie que `titre` et `description` : `id`, `statut` et
                         `dateCreation` sont déterminés par le serveur.

@@ -175,4 +175,87 @@ class TicketControllerIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.statut").value("OUVERT"));
     }
+
+    @Test
+    @DisplayName("PATCH /api/tickets/{id}/statut : OUVERT → EN_COURS renvoie 200")
+    void passerEnCours() throws Exception {
+        String reponse = mockMvc.perform(post("/api/tickets").contentType(MediaType.APPLICATION_JSON)
+                        .content(corps("Cafétière en panne", null)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        long id = json.readTree(reponse).get("id").asLong();
+
+        mockMvc.perform(patch("/api/tickets/{id}/statut", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"statut\": \"EN_COURS\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statut").value("EN_COURS"));
+    }
+
+    @Test
+    @DisplayName("PATCH /api/tickets/{id}/statut : EN_COURS → OUVERT renvoie 200")
+    void repasserOuvert() throws Exception {
+        String reponse = mockMvc.perform(post("/api/tickets").contentType(MediaType.APPLICATION_JSON)
+                        .content(corps("Cafétière en panne", null)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        long id = json.readTree(reponse).get("id").asLong();
+
+        mockMvc.perform(patch("/api/tickets/{id}/statut", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"statut\": \"EN_COURS\"}"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(patch("/api/tickets/{id}/statut", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"statut\": \"OUVERT\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.statut").value("OUVERT"));
+    }
+
+    @Test
+    @DisplayName("PATCH /api/tickets/{id}/statut sur ticket FERME : 409 RG-03")
+    void refuserChangementDepuisFerme() throws Exception {
+        String reponse = mockMvc.perform(post("/api/tickets").contentType(MediaType.APPLICATION_JSON)
+                        .content(corps("Cafétière en panne", null)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        long id = json.readTree(reponse).get("id").asLong();
+
+        mockMvc.perform(patch("/api/tickets/{id}/fermer", id))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(patch("/api/tickets/{id}/statut", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"statut\": \"EN_COURS\"}"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.regle").value("RG-03"))
+                .andExpect(jsonPath("$.message", containsString("RG-03")));
+    }
+
+    @Test
+    @DisplayName("PATCH /api/tickets/{id}/statut id inconnu : 404")
+    void changementTicketInexistant() throws Exception {
+        mockMvc.perform(patch("/api/tickets/{id}/statut", 4242L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"statut\": \"EN_COURS\"}"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", containsString("4242")));
+    }
+
+    @Test
+    @DisplayName("PATCH /api/tickets/{id}/statut statut absent : 400")
+    void refuserStatutAbsent() throws Exception {
+        String reponse = mockMvc.perform(post("/api/tickets").contentType(MediaType.APPLICATION_JSON)
+                        .content(corps("Cafétière en panne", null)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        long id = json.readTree(reponse).get("id").asLong();
+
+        mockMvc.perform(patch("/api/tickets/{id}/statut", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400));
+    }
 }

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ErreurApi } from '../../../shared/http/httpClient';
 import { ticketApi } from '../api/ticketApi';
-import type { ErreurServeur, FiltreStatut, NouvelleDemande, Ticket } from '../domain/ticket';
+import type { ErreurServeur, FiltreStatut, NouvelleDemande, Statut, Ticket } from '../domain/ticket';
 
 /** Les quatre états que l'écran doit pouvoir afficher. */
 export type EtatListe = 'chargement' | 'donnees' | 'vide' | 'erreur';
@@ -30,6 +30,11 @@ export interface EtatTickets {
   idEnFermeture: number | null;
   erreurFermeture: ErreurServeur | null;
   effacerErreurFermeture: () => void;
+
+  changerStatut: (id: number, statut: Statut) => Promise<ErreurServeur | null>;
+  idEnChangementStatut: number | null;
+  erreurChangementStatut: ErreurServeur | null;
+  effacerErreurChangementStatut: () => void;
 }
 
 /**
@@ -48,6 +53,8 @@ export function useTickets(): EtatTickets {
   const [erreurCreation, setErreurCreation] = useState<ErreurApi | null>(null);
   const [idEnFermeture, setIdEnFermeture] = useState<number | null>(null);
   const [erreurFermeture, setErreurFermeture] = useState<ErreurApi | null>(null);
+  const [idEnChangementStatut, setIdEnChangementStatut] = useState<number | null>(null);
+  const [erreurChangementStatut, setErreurChangementStatut] = useState<ErreurApi | null>(null);
 
   // Numérote les requêtes pour ignorer la réponse d'un appel dépassé.
   const numeroRequete = useRef(0);
@@ -140,6 +147,29 @@ export function useTickets(): EtatTickets {
     [charger, filtre],
   );
 
+  const changerStatut = useCallback(
+    async (id: number, statut: Statut): Promise<ErreurServeur | null> => {
+      setIdEnChangementStatut(id);
+      setErreurChangementStatut(null);
+      try {
+        const misAJour = await ticketApi.changerStatut(id, statut);
+        setTickets((actuels) =>
+          actuels.map((t) => (t.id === id ? misAJour : t)),
+        );
+        return null;
+      } catch (e) {
+        const erreurApi =
+          e instanceof ErreurApi ? e : new ErreurApi(500, "Le serveur n'a pas pu changer le statut du ticket.");
+        setErreurChangementStatut(erreurApi);
+        void charger(filtre);
+        return erreurApi;
+      } finally {
+        setIdEnChangementStatut(null);
+      }
+    },
+    [charger, filtre],
+  );
+
   return {
     liste: listeTriee,
     etat,
@@ -162,5 +192,10 @@ export function useTickets(): EtatTickets {
     idEnFermeture,
     erreurFermeture,
     effacerErreurFermeture: () => setErreurFermeture(null),
+
+    changerStatut,
+    idEnChangementStatut,
+    erreurChangementStatut,
+    effacerErreurChangementStatut: () => setErreurChangementStatut(null),
   };
 }

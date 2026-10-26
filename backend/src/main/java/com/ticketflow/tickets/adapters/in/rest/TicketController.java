@@ -4,6 +4,7 @@ import com.ticketflow.tickets.adapters.in.rest.dto.ErreurReponse;
 import com.ticketflow.tickets.application.TicketService;
 import com.ticketflow.tickets.application.dto.TicketCreationDto;
 import com.ticketflow.tickets.application.dto.TicketDto;
+import com.ticketflow.tickets.application.dto.TicketStatutTransitionDto;
 import com.ticketflow.tickets.domain.Statut;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -100,5 +101,24 @@ public class TicketController {
     @PatchMapping("/{id}/fermer")
     public TicketDto fermer(@PathVariable Long id) {
         return service.fermer(id);
+    }
+
+    @Operation(summary = "Changer le statut d'un ticket",
+            description = "Permet de faire passer un ticket de OUVERT à EN_COURS (ou inversement), "
+                    + "ou de le fermer. RG-03 : un ticket déjà FERME ne change plus d'état.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Statut modifié",
+                    content = @Content(schema = @Schema(implementation = TicketDto.class))),
+            @ApiResponse(responseCode = "400", description = "Statut absent ou invalide",
+                    content = @Content(schema = @Schema(implementation = ErreurReponse.class))),
+            @ApiResponse(responseCode = "404", description = "Identifiant inconnu",
+                    content = @Content(schema = @Schema(implementation = ErreurReponse.class))),
+            @ApiResponse(responseCode = "409", description = "Règle RG-03 violée : ticket déjà fermé",
+                    content = @Content(schema = @Schema(implementation = ErreurReponse.class)))
+    })
+    @PatchMapping("/{id}/statut")
+    public TicketDto changerStatut(@PathVariable Long id,
+                                   @Valid @RequestBody TicketStatutTransitionDto dto) {
+        return service.changerStatut(id, dto.statut());
     }
 }

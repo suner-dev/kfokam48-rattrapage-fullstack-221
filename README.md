@@ -231,10 +231,20 @@ Trois évolutions étaient identifiées dans la version initiale de l'API. La pr
 est maintenant implémentée ; les deux autres restent des recommandations.
 
 1. ✅ **`PATCH /api/tickets/{id}/statut` avec DTO de transition** — *fait* :
-   `EN_COURS` n'est plus un état mort de l'API. Le filtre par statut demandé par
-   le sujet est désormais exploitable en production (transitions OUVERT ↔ EN_COURS,
-   ou vers FERME, refus 409 RG-03 si le ticket est déjà fermé). Voir la table des
-   endpoints §3.
+    `EN_COURS` n'est plus un état mort de l'API. Le filtre par statut demandé par
+    le sujet est désormais exploitable en production (transitions OUVERT ↔ EN_COURS,
+    ou vers FERME, refus 409 RG-03 si le ticket est déjà fermé). Voir la table des
+    endpoints §3.
+
+    **Implémentation fullstack complète** :
+    - Backend : DTO `TicketStatutTransitionDto`, garde RG-03, contrôleur PATCH,
+      27 tests unitaires + d'intégration (0 échec).
+    - Frontend : méthode `changerStatut()` dans `ticketApi.ts` + hook
+      `useTickets.changerStatut()`, helpers `peutProposerChangementStatut()` /
+      `statutCiblePourChangement()` dans `ticket.ts`, boîte de dialogue
+      accessible `BoiteChangementStatut.tsx`, boutons "Passer En cours"/"Passer
+      Ouvert" dans `TicketTableau.tsx` avec espacement et styles améliorés
+      (nouveau style `.bouton-statut`, ombre au clic, gap horizontal).
 
 2. **Journal des transitions (`ticket_evenement`)** — *pourquoi* : la fermeture est
    destructive pour l'historique, et un support sans date de fermeture ne peut pas
